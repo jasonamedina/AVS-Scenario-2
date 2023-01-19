@@ -9,42 +9,42 @@ https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/scenarios/azure
 **Hub vNET**
 
 1.	Please create the following subnets in your Hub vNET. 
-a.	ExternalFWSubnet - Recommend a minimum of /27 or larger. Name can be anything you’d like, just please make sure it indicates “External”.
-b.	InsideFWSubnet - Recommend a minimum of /27 or larger. Name can be anything you’d like, just please make sure it indicates “Internal”.
-c.	ManagementSubnet - Recommend a minimum of /27 or larger. Name can be anything you’d like, just please make sure it indicates “Management”.
-d.	RouteServerSubnet – Must be a minimum of /27 or larger and the subnet name must be exactly RouteServerSubnet
 
-2.	Create an Azure Route Server. Please do this during a maintenance window because there will be a small outage between on-prem and Azure during the ARS deployment. 
-https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#create-a-route-server-1
+ExternalFWSubnet - Recommend a minimum of /27 or larger. Name can be anything you’d like, just please make sure it indicates “External”.
+InsideFWSubnet - Recommend a minimum of /27 or larger. Name can be anything you’d like, just please make sure it indicates “Internal”.
+ManagementSubnet - Recommend a minimum of /27 or larger. Name can be anything you’d like, just please make sure it indicates “Management”.
+RouteServerSubnet – Must be a minimum of /27 or larger and the subnet name must be exactly RouteServerSubnet
 
-        2a.	Once Azure Route Server has been deployed, enable Branch-To-Branch.
-        https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#configure-route-exchange
+2. Create an Azure Route Server. Please do this during a maintenance window because there will be a small outage between on-prem and Azure during the ARS deployment. 
+   https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#create-a-route-server-1
 
-3.	Create your FW NVA which you can get in the Marketplace. In our example in the diagram, we show just one FW NVA. However, if you would like to have redundancy you should be deploying two FW NVA’s (Active/Standby, Active/Active).
-a.	Make sure to use a private BGP AS that is not reserved in Azure. Please make sure that this AS is different from the one you’re going to use on the BGP NVA.
+3. Once Azure Route Server has been deployed, enable Branch-To-Branch.
+   https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#configure-route-exchange
+
+4.	Create your FW NVA which you can get in the Marketplace. In our example in the diagram, we show just one FW NVA. However, if you would like to have redundancy you should be deploying two FW NVA’s (Active/Standby, Active/Active).
+	Make sure to use a private BGP AS that is not reserved in Azure. Please make sure that this AS is different from the one you’re going to use on the BGP NVA.
  
-b.	Configure BGP routing on your FW NVA Internal IP to peer with the Azure Route Server
-c.	Please make sure to use an eBGP multi-hop of 5 when peering from the FW NVA to Azure Route Server
-https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#complete-the-configuration-on-the-nva
+5.	Configure BGP routing on your FW NVA Internal IP to peer with the Azure Route Server. Make sure to use an eBGP multi-hop of 255 when peering from the FW NVA to Azure Route Server
+    https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#complete-the-configuration-on-the-nva
 
-d.	Configure BGP Peering from Azure Route Server to FW NVA Internal IP’s
-https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#set-up-peering-with-nva
+6.	Configure BGP Peering from Azure Route Server to FW NVA Internal IP’s
+    https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#set-up-peering-with-nva
 
-e.	Confirm BGP Neighbor is up between FW NVA and Azure Route Server in Hub vNET. You can check this on the NVA side. 
+7. Confirm BGP Neighbor is up between FW NVA and Azure Route Server in Hub vNET. You can check this on the NVA side. 
 
-4.	Create a Route Table in the same region where your Hub vNET is deployed. 
-https://learn.microsoft.com/en-us/azure/virtual-network/manage-route-table#create-a-route-table
-a.	Click “Yes” for “Propagate gateway routes”
-b.	Create routes for the management AVS /22 block and AVS Segments to point to the next-hop of the FW Internal IP as shown in the diagram below
-c.	Associate the Routing table with the GatewaySubnet in your Hub vNET.
-https://learn.microsoft.com/en-us/azure/virtual-network/manage-route-table#associate-a-route-table-to-a-subnet
+8. Create a Route Table in the same region where your Hub vNET is deployed. 
+   https://learn.microsoft.com/en-us/azure/virtual-network/manage-route-table#create-a-route-table
+	Click “Yes” for “Propagate gateway routes”
+    Create routes for the management AVS /22 block and AVS Segments to point to the next-hop of the FW Internal IP as shown in the diagram below
+    Associate the Routing table with the GatewaySubnet in your Hub vNET.
+    https://learn.microsoft.com/en-us/azure/virtual-network/manage-route-table#associate-a-route-table-to-a-subnet
  
 
 
-5.	Most likely your FW NVA’s have an interface in each of following subnets below. However, once a default-route is advertised from your FW NVA to your Azure Route Server (ARS), there is a potential for a routing loop to happen on both External and Management Subnets for your FW NVA. This routing loop only impacts traffic that is destined to the Internet. To avoid this loop, you will need to create a Routing-Table for both your External and Management Subnets only (Do Not Create One for Inside Subnet). In each routing table, you will create a default-route (0.0.0.0/0) User Defined Route (UDR) with a next-hop of “Internet”. Once the entry has been created, you can then associate the Routing-Table to the Subnet.
-a.	ExternalFWSubnet – Associate the External Routing-Table to this Subnet
-b.	ManagementSubnet - Associate the Management Routing-Table to this Subnet
-c.	InsideFWSubnet – DO NOT create a Routing Table for your inside subnet because it won’t be needed for this scenario. 
+9.	Most likely your FW NVA’s have an interface in each of following subnets below. However, once a default-route is advertised from your FW NVA to your Azure Route Server (ARS), there is a potential for a routing loop to happen on both External and Management Subnets for your FW NVA. This routing loop only impacts traffic that is destined to the Internet. To avoid this loop, you will need to create a Routing-Table for both your External and Management Subnets only (Do Not Create One for Inside Subnet). In each routing table, you will create a default-route (0.0.0.0/0) User Defined Route (UDR) with a next-hop of “Internet”. Once the entry has been created, you can then associate the Routing-Table to the Subnet.
+	ExternalFWSubnet – Associate the External Routing-Table to this Subnet
+	ManagementSubnet - Associate the Management Routing-Table to this Subnet
+	InsideFWSubnet – DO NOT create a Routing Table for your inside subnet because it won’t be needed for this scenario. 
 
 
 
