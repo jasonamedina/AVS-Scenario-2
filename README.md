@@ -8,7 +8,9 @@ https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/scenarios/azure
 
 **Hub vNET**
 
-1.	Please create the following subnets in your Hub vNET. 
+1.	Please create the following subnets in your Hub vNET.
+
+Subnets to deploy inside Hub vNET
 
        ExternalFWSubnet: Recommend a minimum of /27 or larger. Name can be anything you’d like, just please make sure it indicates “External”.
 
@@ -74,59 +76,89 @@ https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/scenarios/azure
 
 
 
+
+
 **AVS Transit vNET**
 
-6.	Create a new vNET that will be your “AVS Transit Virtual Network” in the same region where you will be deploying your AVS Private Cloud. Please make sure to size the vNET properly for a minimum of four subnets. 
-a.	Subnets to deploy inside AVS Transit vNET
-a.	RouteServerSubnet – Must be a minimum of /27 or larger and the subnet name must be exactly RouteServerSubnet
-b.	GatewaySubnet – Must be a minimum of /27 or larger and the subnet name must be exactly GatewaySubnet
-c.	InsideSubnet - Recommend a minimum of /27 or larger. Name can be anything you’d like, just please make sure it indicates “Inside”.
-d.	OutsideSubnet - Recommend a minimum of /27 or larger. Name can be anything you’d like, just please make sure it indicates “Outside”.
+10.	Create a new vNET that will be your “AVS Transit Virtual Network” in the same region where you will be deploying your AVS Private Cloud. Please make sure to size the vNET properly for a minimum of four subnets. 
 
-7.	Create an ExpressRoute Virtual Network Gateway inside the AVS Transit vNET. Please see the link below on how to do the install. 
+	Subnets to deploy inside AVS Transit vNET
+	
+		RouteServerSubnet: Must be a minimum of /27 or larger and the subnet name must be exactly RouteServerSubnet
+		
+		GatewaySubnet: Must be a minimum of /27 or larger and the subnet name must be exactly GatewaySubnet
+		
+		InsideSubnet: Recommend a minimum of /27 or larger. Name can be anything you’d like, just please make sure it indicates “Inside”.
+		
+		OutsideSubnet: Recommend a minimum of /27 or larger. Name can be anything you’d like, just please make sure it indicates “Outside”.
+
+11.	Create an ExpressRoute Virtual Network Gateway inside the AVS Transit vNET. Please see the link below on how to do the install. 
+
 https://learn.microsoft.com/en-us/azure/expressroute/expressroute-howto-add-gateway-portal-resource-manager#create-the-virtual-network-gateway
+
 We also recommend deploying a Zone-Redundant SKU
-•	ErGw1AZ
-•	ErGw2AZ
-•	ErGw3AZ
+
+	ErGw1AZ
+	
+	ErGw2AZ
+	
+	ErGw3AZ
+	
 https://learn.microsoft.com/en-us/azure/expressroute/expressroute-about-virtual-network-gateways#zrgw
 
-8.	Create an Azure Route Server. You don’t need to complete this step during a maintenance window since this vNET is not connected back to on-prem via a Network Gateway. 
+12. Create an Azure Route Server. You don’t need to complete this step during a maintenance window since this vNET is not connected back to on-prem via a Network Gateway.
+
 https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#create-a-route-server-1
-a.	Once Azure Route Server has been deployed, please enable Branch-To-Branch
-                             https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#configure-route-exchange
 
-9.	Create your BGP NVA. For example, this can be a Cisco NVA (Cisco CSR) which you can get in the Marketplace. In our example in the diagram, we show just one BGP NVA. However, if you would like to have redundancy you should be deploying two BGP NVA’s. Please make sure you deploy the NVA with at least two NICs as shown in the diagram.
+13. Once Azure Route Server has been deployed, please enable Branch-To-Branch
 
-a.	One NIC will be connected to the InsideSubnet and the other will be connected to the OutsideSubnet.
-b.	You would repeat the same steps above if you are deploying an additional BGP NVA.
+https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#configure-route-exchange
 
-10.	Configure a BGP neighbor between your BGP NVA Inside IP and Azure Route Server in the AVS Transit vNET.
+14. Create your BGP NVA. For example, this can be a Cisco NVA which you can get in the Marketplace. In our example in the diagram, we show just one BGP NVA. However, if you would like to have redundancy you should be deploying two BGP NVA’s. Please make sure you deploy the NVA with at least two NICs as shown in the diagram.
 
-a.	Make sure to use a private BGP AS that is not reserved by Azure. Please make sure that this AS is different from the one you’re using on your FW NVA.
+15.	One NIC on the NVA will be connected to the InsideSubnet and the other will be connected to the OutsideSubnet.
+	You would repeat the same steps above if you are deploying an additional BGP NVA.
+
+16.	Configure a BGP neighbor between your BGP NVA Inside IP and Azure Route Server in the AVS Transit vNET.
+
+17.	Make sure to use a private BGP AS that is not reserved by Azure. 
+	
+ ![image](https://user-images.githubusercontent.com/97964083/213565242-fe68fca4-00e1-4a90-bbea-f15bdfd4aae0.png)
  
-b.	Configure BGP routing on your BGP NVA Inside IP to peer with the Azure Route Server
-c.	Please make sure to use an eBGP multi-hop of 5 when peering from the BGP NVA to Azure Route Server
+***Please make sure that the BGP AS used on the "BGP NVA" is different from the one you’re using on your "FW NVA".***
+
+18. Configure BGP routing on your BGP NVA Inside IP to peer with the Azure Route Server. 
+
+19. Configure eBGP multi-hop of 255 when peering from the BGP NVA to Azure Route Server
+		
 https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#complete-the-configuration-on-the-nva
 
-d.	Configure BGP Peering from Azure Route Server to BGP NVA Inside IP
+20. Configure BGP Peering from Azure Route Server to BGP NVA Inside IP
+
 https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#set-up-peering-with-nva
 
-e.	Confirm BGP Neighbor is up between the BGP NVA and Azure Route Server in AVS Transit vNET. You can check this on the NVA side. 
+21. Confirm BGP Neighbor is up between the BGP NVA and Azure Route Server in AVS Transit vNET. You can check this on the NVA side. 
 
-11.	Peer your Hub vNET with the AVS Transit vNET
+22. Peer your Hub vNET with the AVS Transit vNET
+
 https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-manage-peering#create-a-peering
 
-12.	Create a Route Table in the same region where your AVS Transit vNET is deployed. 
+23. Create a Route Table in the same region where your AVS Transit vNET is deployed.
+ 
 https://learn.microsoft.com/en-us/azure/virtual-network/manage-route-table#create-a-route-table
-a.	Click “No” for “Propagate gateway routes”
-b.	Create routes for Hub vNET IP Space or any Spoke vNETs to point to the next-hop of the FW Internal IP as shown in the diagram below
-c.	Create a default-route 0.0.0.0/0 with a next-hop of the FW Internal IP.
-d.	Associate the Routing table with the “OutsideSubnet” in your AVS Transit vNET.
+
+	Click “No” for “Propagate gateway routes”
+	
+	Create routes for Hub vNET IP Space or any Spoke vNETs to point to the next-hop of the FW Internal IP as shown in the diagram below
+	
+	Create a default-route 0.0.0.0/0 with a next-hop of the FW Internal IP.
+	
+        Associate the Routing table with the “OutsideSubnet” in your AVS Transit vNET.
+	
 https://learn.microsoft.com/en-us/azure/virtual-network/manage-route-table#associate-a-route-table-to-a-subnet
  
 
-13.	Configure BGP peering between the Outside Interface of the BGP NVA to the Azure Route Server in the Hub vNET. 
+24.	Configure BGP peering between the Outside Interface of the BGP NVA to the Azure Route Server in the Hub vNET. 
 a.	Configure BGP routing on your BGP NVA Outside Interface IP to peer with the Azure Route Server
 b.	Please make sure to use an eBGP multi-hop of 5 when peering from the BGP NVA to Azure Route Server
 https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#complete-the-configuration-on-the-nva
