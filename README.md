@@ -45,8 +45,11 @@ https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/scenarios/azure
 
 
 9.	Most likely your FW NVA’s have an interface in each of following subnets below. However, once a default-route is advertised from your FW NVA to your Azure Route Server (ARS), there is a potential for a routing loop to happen on both External and Management Subnets for your FW NVA. This routing loop only impacts traffic that is destined to the Internet. To avoid this loop, you will need to create a Routing-Table for both your External and Management Subnets only (Do Not Create One for Inside Subnet). In each routing table, you will create a default-route (0.0.0.0/0) User Defined Route (UDR) with a next-hop of “Internet”. Once the entry has been created, you can then associate the Routing-Table to the Subnet.
+
 	ExternalFWSubnet – Associate the External Routing-Table to this Subnet
+
 	ManagementSubnet - Associate the Management Routing-Table to this Subnet
+
 	InsideFWSubnet – DO NOT create a Routing Table for your inside subnet because it won’t be needed for this scenario. 
 
 
