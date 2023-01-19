@@ -17,8 +17,8 @@ d.	RouteServerSubnet – Must be a minimum of /27 or larger and the subnet name 
 2.	Create an Azure Route Server. Please do this during a maintenance window because there will be a small outage between on-prem and Azure during the ARS deployment. 
 https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#create-a-route-server-1
 
-2a.	Once Azure Route Server has been deployed, enable Branch-To-Branch.
-https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#configure-route-exchange
+        2a.	Once Azure Route Server has been deployed, enable Branch-To-Branch.
+        https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#configure-route-exchange
 
 3.	Create your FW NVA which you can get in the Marketplace. In our example in the diagram, we show just one FW NVA. However, if you would like to have redundancy you should be deploying two FW NVA’s (Active/Standby, Active/Active).
 a.	Make sure to use a private BGP AS that is not reserved in Azure. Please make sure that this AS is different from the one you’re going to use on the BGP NVA.
@@ -127,11 +127,3 @@ neighbor x.x.x.x as-override
 Regardless these two options will remove the problem of routes getting dropped. Please let me know if you’re using Cisco and I can send you help configs I’ve used in my labs in the past. 
 
  ![image](https://user-images.githubusercontent.com/97964083/213533269-82efec30-1efb-495a-9821-2392e93d65b4.png)
-
-
-**Steps 15-18 only apply if you currently have AVS and looking to migrate to Scenario 2. **
-
-15.	Delete the Global Reach connection from AVS to on-premise. This can be deleted in the AVS Portal.
-16.	Delete your ExpressRoute connection for AVS on the Network Gateway that lives in the Hub vNET
-17.	Create a new ExpressRoute connection for AVS to the Network Gateway on the AVS Transit vNET
-18.	Test connectivity to AVS from On-Premise and Azure vNET subnets with a native Azure VM.
