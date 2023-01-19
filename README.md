@@ -36,10 +36,15 @@ https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/scenarios/azure
 7. Confirm BGP Neighbor is up between FW NVA and Azure Route Server in Hub vNET. You can check this on the NVA side. 
 
 8. Create a Route Table in the same region where your Hub vNET is deployed. 
+
    https://learn.microsoft.com/en-us/azure/virtual-network/manage-route-table#create-a-route-table
+
 	Click “Yes” for “Propagate gateway routes”
+
     Create routes for the management AVS /22 block and AVS Segments to point to the next-hop of the FW Internal IP as shown in the diagram below
+
     Associate the Routing table with the GatewaySubnet in your Hub vNET.
+
     https://learn.microsoft.com/en-us/azure/virtual-network/manage-route-table#associate-a-route-table-to-a-subnet
  
 
