@@ -10,7 +10,7 @@ https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/scenarios/azure
 
 1.	Please create the following subnets in your Hub vNET. 
 
-ExternalFWSubnet - Recommend a minimum of /27 or larger. Name can be anything you’d like, just please make sure it indicates “External”.
+ExternalFWSubnet: Recommend a minimum of /27 or larger. Name can be anything you’d like, just please make sure it indicates “External”.
 InsideFWSubnet - Recommend a minimum of /27 or larger. Name can be anything you’d like, just please make sure it indicates “Internal”.
 ManagementSubnet - Recommend a minimum of /27 or larger. Name can be anything you’d like, just please make sure it indicates “Management”.
 RouteServerSubnet – Must be a minimum of /27 or larger and the subnet name must be exactly RouteServerSubnet
