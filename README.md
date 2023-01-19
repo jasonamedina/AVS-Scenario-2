@@ -122,7 +122,9 @@ Or you can simply use a feature called AS-Override. Where “x.x.x.x” is the I
 neighbor x.x.x.x as-override
 
 Regardless these two options will remove the problem of routes getting dropped. Please let me know if you’re using Cisco and I can send you help configs I’ve used in my labs in the past. 
- 
+
+ ![image](https://user-images.githubusercontent.com/97964083/213533269-82efec30-1efb-495a-9821-2392e93d65b4.png)
+
 
 **Steps 15-18 only apply if you currently have AVS and looking to migrate to Scenario 2. **
 
