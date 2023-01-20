@@ -1,31 +1,30 @@
 # AVS Network Scenario 2: Step-by-Step Guide
 The following are step-by-step instructions on what needs to be deployed in your Hub vNET and AVS Transit vNET to successfully deploy AVS Network Scenario 2. I would recommend while following along all steps to have the network diagram up on a separate monitor.
 
+**Example architectures for Azure VMWare Solutions**    
 https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/scenarios/azure-vmware/example-architectures
 
- ![image](https://user-images.githubusercontent.com/97964083/213535226-6701fe5d-cfab-4469-aa99-1093e39b790c.png)
+ ![eslz-net-scenario-2](https://user-images.githubusercontent.com/97964083/213711299-98a4216e-ed77-41ea-8108-731d20559669.png)
+
 
 
 **Hub vNET**
 
-1.	Please create the following subnets in your Hub vNET.
+1. Please create the following subnets in your Hub vNET.   
 
-Subnets to deploy inside Hub vNET
-
-       ExternalFWSubnet: Recommend a minimum of /27 or larger. Name can be anything you’d like, just please make sure it indicates “External”.
-
-       InsideFWSubnet: Recommend a minimum of /27 or larger. Name can be anything you’d like, just please make sure it indicates “Internal”.
-
-       ManagementSubnet: Recommend a minimum of /27 or larger. Name can be anything you’d like, just please make sure it indicates “Management”.
-
-       RouteServerSubnet: Must be a minimum of /27 or larger and the subnet name must be exactly RouteServerSubnet
+   		ExternalFWSubnet: Recommend a minimum of /27 or larger. Name can be anything you’d like, just please make sure it indicates “External”.  
+  		InsideFWSubnet: Recommend a minimum of /27 or larger. Name can be anything you’d like, just please make sure it indicates “Internal”.  
+   		ManagementSubnet: Recommend a minimum of /27 or larger. Name can be anything you’d like, just please make sure it indicates “Management”.      
+   		RouteServerSubnet: Must be a minimum of /27 or larger and the subnet name must be exactly RouteServerSubnet.  
 
 2. Create an Azure Route Server. Please do this during a maintenance window because there will be a small outage between on-prem and Azure during the ARS deployment.
 
+   **Create a Route Server**  
    https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#create-a-route-server-1
 
 3. Once Azure Route Server has been deployed, enable Branch-To-Branch.
 
+   **Configure route exchange**  
    https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#configure-route-exchange
 
 4. Create your FW NVA which you can get in the Marketplace. In our example in the diagram, we show just one FW NVA. However, if you would like to have redundancy you should be deploying two FW NVA’s (Active/Standby, Active/Active). Make sure to use a private BGP AS that is not reserved in Azure. Please make sure that the BGP AS is different from the one you’re going to use on the BGP NVA in the AVS Transit vNET.
