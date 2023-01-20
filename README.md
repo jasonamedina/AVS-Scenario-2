@@ -198,6 +198,45 @@ You can simply use a feature called AS-Override. Where “x.x.x.x” is the IP o
 
 neighbor x.x.x.x as-override
 
+	router bgp 65001
+ 	bgp log-neighbor-changes
+	####Neighbor Configuration to ARS in Hub vNET###
+ 	neighbor 10.100.1.4 remote-as 65515
+ 	neighbor 10.100.1.4 description PEER-1 NET Hub vNET ARS
+ 	neighbor 10.100.1.4 ebgp-multihop 255
+ 	neighbor 10.100.1.4 as-override
+ 	neighbor 10.100.1.4 soft-reconfiguration inbound
+ 	neighbor 10.100.1.5 remote-as 65515
+ 	neighbor 10.100.1.5 description PEER-2 Hub vNET ARS
+ 	neighbor 10.100.1.5 ebgp-multihop 255
+ 	neighbor 10.100.1.5 as-override
+ 	neighbor 10.100.1.5 soft-reconfiguration inbound
+	####Neighbor Configuration to ARS in Hub vNET####  
+        
+	####Neighbor Configuration to ARS in AVS Transit vNET####
+ 	neighbor 10.200.1.4 description PEER-1 AVS vNET Transit ARS
+ 	neighbor 10.200.1.4 remote-as 65515
+ 	neighbor 10.200.1.4 ebgp-multihop 255
+ 	neighbor 10.200.1.4 as-override
+ 	neighbor 10.200.1.4 soft-reconfiguration inbound
+ 	neighbor 10.200.1.5 description PEER-2 AVS vNET Transit ARS
+ 	neighbor 10.200.1.5 remote-as 65515
+ 	neighbor 10.200.1.5 ebgp-multihop 255
+ 	neighbor 10.200.1.5 as-override
+ 	neighbor 10.200.1.5 soft-reconfiguration inbound
+	####Neighbor Configuration to ARS in AVS Transit vNET####
+	!
+	
+	####Static Route to ARS in Hub vNET from Outside Interface. Use Default-Gateway of the Outside Subnet for the next hop####
+	ip route 10.100.1.4 255.255.255.255 10.20.20.1
+	ip route 10.100.1.5 255.255.255.255 10.20.20.1                                                                                                         
+        ####Static Route to ARS in Hub vNET from Outside Interface. Use Default-Gateway of the Outside Subnet for the next hop####  
+	
+	####Static Route to ARS in AVS vNET Transit from Inside Interface. Use Default-Gateway of the Inside Subnet for the next hop####
+	ip route 10.200.1.4 255.255.255.255 10.30.30.1
+	ip route 10.200.1.5 255.255.255.255 10.30.30.1  
+	####Static Route to ARS in AVS vNET Transit from Inside Interface. Use Default-Gateway of the Inside Subnet for the next hop####  
+	
 Regardless these two options will remove the problem of routes getting dropped. Please make sure to follow up with your vendor's documentation on how to configure BGP AS-Override or rewriting the BGP AS. 
 
 
