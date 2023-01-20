@@ -31,26 +31,28 @@ https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/scenarios/azure
 	![image](https://user-images.githubusercontent.com/97964083/213557308-97eb08c0-cb5a-40b1-9671-3e0ff09c2b0a.png)
 
  
-5. Configure BGP routing on your FW NVA Internal IP to peer with the Azure Route Server. Make sure to use an eBGP multi-hop of 255 when peering from the FW NVA to Azure Route Server
+5. Configure BGP routing on your FW NVA Internal IP to peer with the Azure Route Server. Make sure to use an eBGP multi-hop of 255 when peering from the FW NVA to Azure Route Server.
 
+    **Complete the configuration on the NVA**  
     https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#complete-the-configuration-on-the-nva
 
 6. Configure BGP Peering from Azure Route Server to FW NVA Internal IP’s
 
+    **Set up peering with NVA**  
     https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#set-up-peering-with-nva
 
 7. Confirm BGP Neighbor is up between FW NVA and Azure Route Server in Hub vNET. You can check this on the NVA side. 
 
 8. Create a Route Table in the same region where your Hub vNET is deployed. 
-
+    
+    **Create a route table**  
    https://learn.microsoft.com/en-us/azure/virtual-network/manage-route-table#create-a-route-table
 
-    Click “Yes” for “Propagate gateway routes”
+    Click “Yes” for “Propagate gateway routes”.  
+    Create routes for the management AVS /22 block and AVS Segments to point to the next-hop of the FW Internal IP as shown in the diagram below.  
+    Associate the Routing table with the GatewaySubnet in your Hub vNET.  
 
-    Create routes for the management AVS /22 block and AVS Segments to point to the next-hop of the FW Internal IP as shown in the diagram below
-
-    Associate the Routing table with the GatewaySubnet in your Hub vNET.
-
+    **Associate a route table to a subnet**  
     https://learn.microsoft.com/en-us/azure/virtual-network/manage-route-table#associate-a-route-table-to-a-subnet
     
     ![image](https://user-images.githubusercontent.com/97964083/213558220-68ac4bfd-38fc-408d-bc0e-1cfc2acfe5dc.png)
@@ -60,15 +62,16 @@ https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/scenarios/azure
 
 	In each routing table, you will create a default-route (0.0.0.0/0) User Defined Route (UDR) with a next-hop of “Internet”. Once the entry has been created, you can then associate the Routing-Table to the Subnet.
 
-	ExternalFWSubnet: Associate the External Routing-Table to this Subnet
-
-	ManagementSubnet: Associate the Management Routing-Table to this Subnet
-
-	***InsideFWSubnet: DO NOT create a Routing Table for your inside subnet because it won’t be needed for this scenario.*** 
+	 	ExternalFWSubnet: Associate the External Routing-Table to this Subnet.  
+		ManagementSubnet: Associate the Management Routing-Table to this Subnet.  
+		
+	 ***InsideFWSubnet: DO NOT create a Routing Table for your inside subnet because it won’t be needed for this scenario.***  
 	
-	https://learn.microsoft.com/en-us/azure/virtual-network/manage-route-table#create-a-route-table
-
-	https://learn.microsoft.com/en-us/azure/virtual-network/manage-route-table#associate-a-route-table-to-a-subnet
+	**Create a route table**  
+	https://learn.microsoft.com/en-us/azure/virtual-network/manage-route-table#create-a-route-table  
+	
+     **Associate a route table to a subnet**    
+     https://learn.microsoft.com/en-us/azure/virtual-network/manage-route-table#associate-a-route-table-to-a-subnet
 
 
 
