@@ -182,24 +182,15 @@ https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-
 
 27. Confirm BGP Neighbor is up between the BGP NVA and Azure Route Server in Hub vNET. You can check this on the NVA side.
 
-28.  By default, the Azure Route Servers are hard coded to use BGP AS 65515 and up until the day of this writing there is currently no way to modify that. eBGP has a loop prevention mechanism where it will drops “BGP Routes” where it sees its own BGP AS in the "AS Path". For example, in the diagram below the BGP NVA learns routes from the Azure Route Server in the Hub vNET. The BGP NVA will then advertise those routes to the Azure Route Server in the AVS Transit vNET. The Azure Route Server on the AVS Transit vNET will drop the routes because it already sees itself in the BGP AS Path 65515.  To solve this problem, we need the BGP NVA to rewrite the AS 65515 so neither ARS on both sides sees itself in the AS Path and drops the routes. 
+28.  By default, the Azure Route Servers are hard coded to use BGP AS 65515 and up until the day of this writing there is currently no way to modify that. eBGP has a loop prevention mechanism where it will drops “BGP Routes” where it sees its own BGP AS in the "AS Path". For example, in the diagram below the BGP NVA learns routes from the Azure Route Server in the Hub vNET. The BGP NVA will then advertise those routes to the Azure Route Server in the AVS Transit vNET. The Azure Route Server in the AVS Transit vNET will drop the routes because it already sees itself in the BGP AS Path 65515.  To solve this problem, we need the BGP NVA to rewrite the AS 65515 so neither ARS on both vNETs sees itself in the AS Path and drops the routes. 
 
 ![image](https://user-images.githubusercontent.com/97964083/213778849-52b3a0e7-d692-45f8-84b9-150106ce03e9.png)
 
+29. One feature to solve this problem is called BGP AS Override.  
 
-***Example if you're using Cisco CSR or Catalyst 8000v Edge***
+**Cisco CSR Config Example with AS Override**  
 
-You can use the BGP replace-as feature 
-
-https://content.cisco.com/chapter.sjs?uri=/searchable/chapter/content/en/us/td/docs/ios-xml/ios/iproute_bgp/configuration/xe-17/irg-xe-17-book/bgp-replace-ASNs.html.xml
-
-Or 
-
-You can simply use a feature called AS-Override. Where “x.x.x.x” is the IP of the Azure Route Server.
-
-neighbor x.x.x.x as-override
-
-	router bgp 65001
+	router bgp 65010
  	bgp log-neighbor-changes
 	
 	Neighbor Configuration to ARS in Hub vNET
@@ -241,6 +232,7 @@ neighbor x.x.x.x as-override
 	ip route 10.200.1.4 255.255.255.255 10.30.30.1  
 	ip route 10.200.1.5 255.255.255.255 10.30.30.1  
 	#########################################################################################################################
-Regardless these two options will remove the problem of routes getting dropped. Please make sure to follow up with your vendor's documentation on how to configure BGP AS-Override or rewriting the BGP AS. 
+	
+Please make sure to follow up with your vendor's documentation on how to configure BGP AS-Override or rewriting the BGP AS. 
 
 
