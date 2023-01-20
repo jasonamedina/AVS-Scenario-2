@@ -94,7 +94,12 @@ https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/scenarios/azure
 		InsideSubnet: Recommend a minimum of /27 or larger. Name can be anything you’d like, just please make sure it indicates “Inside”.  
 		OutsideSubnet: Recommend a minimum of /27 or larger. Name can be anything you’d like, just please make sure it indicates “Outside”.  
 
-11.	Create an ExpressRoute Virtual Network Gateway inside the AVS Transit vNET. Please see the link below on how to do the install.  
+11. Peer your Hub vNET with the AVS Transit vNET
+
+**Create a peering**
+https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-manage-peering#create-a-peering
+
+12.	Create an ExpressRoute Virtual Network Gateway inside the AVS Transit vNET. Please see the link below on how to do the install.  
 
 **Create the virtual network gateway**  
 https://learn.microsoft.com/en-us/azure/expressroute/expressroute-howto-add-gateway-portal-resource-manager#create-the-virtual-network-gateway
@@ -108,82 +113,76 @@ We also recommend deploying a Zone-Redundant SKU
 **Zone-redundant gateway SKUs**  
 https://learn.microsoft.com/en-us/azure/expressroute/expressroute-about-virtual-network-gateways#zrgw
 
-12. Create an Azure Route Server. You don’t need to complete this step during a maintenance window since this vNET is not connected back to on-prem via a Network Gateway.
+13. Create an Azure Route Server. You don’t need to complete this step during a maintenance window since this vNET is not connected back to on-prem via a Network Gateway.
 
  **Create a Route Server**  
 https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#create-a-route-server-1
 
-13. Once Azure Route Server has been deployed, please enable Branch-To-Branch
+14. Once Azure Route Server has been deployed, please enable Branch-To-Branch
 
 **Configure route exchange**  
 https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#configure-route-exchange
 
-14. Create your BGP NVA. For example, this can be a Cisco NVA which you can get in the Marketplace. In our example in the diagram, we show just one BGP NVA. However, if you would like to have redundancy you should be deploying two BGP NVA’s. Please make sure you deploy the NVA with at least two NICs. 
+15. Create your BGP NVA. For example, this can be a Cisco NVA which you can get in the Marketplace. In our example in the diagram, we show just one BGP NVA. However, if you would like to have redundancy you should be deploying two BGP NVA’s. Please make sure you deploy the NVA with at least two NICs. 
 
-15.	One NIC on the NVA will be connected to the InsideSubnet and the other will be connected to the OutsideSubnet.
+16.	One NIC on the NVA will be connected to the InsideSubnet and the other will be connected to the OutsideSubnet.
 	You would repeat the same steps above if you are deploying an additional BGP NVA.  
 	![image](https://user-images.githubusercontent.com/97964083/213725429-2ee3bf4f-a31b-41fb-8ad8-57851e2478eb.png)
 
-16.	Configure a BGP peer from your Azure Route Server in the AVS Transit vNET to peer with BGP NVA Inside IP.  
+17.	Configure a BGP peer from your Azure Route Server in the AVS Transit vNET to peer with BGP NVA Inside IP.  
         
 	 **Set up peering with NVA**  
          https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#set-up-peering-with-nva
     
-17.	Make sure to use a private BGP AS that is not reserved by Azure. 
+18.	Make sure to use a private BGP AS that is not reserved by Azure. 
 	
  ![image](https://user-images.githubusercontent.com/97964083/213565242-fe68fca4-00e1-4a90-bbea-f15bdfd4aae0.png)
  
 ***Please make sure that the BGP AS used on the "BGP NVA" is different from the one you’re using on your "FW NVA".***
 
-18. Configure BGP routing from your BGP NVA Inside IP to peer with the Azure Route Server in the AVS Transit vNET.  
+19. Configure BGP routing from your BGP NVA Inside IP to peer with the Azure Route Server in the AVS Transit vNET.  
 
  **Complete the configuration on the NVA**
 https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#complete-the-configuration-on-the-nva
 
-19. Configure eBGP multi-hop of 255 when peering from the BGP NVA to Azure Route Server. Please check with your vendor documentation on how to configure eBGP multi-hop. 
+20. Configure eBGP multi-hop of 255 when peering from the BGP NVA to Azure Route Server. Please check with your vendor documentation on how to configure eBGP multi-hop. 
 
-20. Configure BGP Peering from Azure Route Server Hub vNET to BGP NVA Outside IP
+21. Configure BGP Peering from Azure Route Server Hub vNET to BGP NVA Outside IP
 
 **Set up peering with NVA**  
   https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#set-up-peering-with-nva
 
-21. Confirm BGP Neighbor is up between the BGP NVA and Azure Route Server in both AVS Transit vNET and Hub vNET. You can check this on the NVA side. 
-
-22. Peer your Hub vNET with the AVS Transit vNET
-
-https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-manage-peering#create-a-peering
+22. Confirm BGP Neighbor is up between the BGP NVA and Azure Route Server in both AVS Transit vNET and Hub vNET. You can check this on the NVA side. 
 
 23. Create a Route Table in the same region where your AVS Transit vNET is deployed.
  
-https://learn.microsoft.com/en-us/azure/virtual-network/manage-route-table#create-a-route-table
 
-	Click “No” for “Propagate gateway routes”
-	
-	Create routes for Hub vNET IP Space or any Spoke vNETs to point to the next-hop of the FW Internal IP as shown in the diagram below
-	
-	Create a default-route 0.0.0.0/0 with a next-hop of the FW Internal IP.
-	
-        Associate the Routing table with the “OutsideSubnet” in your AVS Transit vNET.
-	
-https://learn.microsoft.com/en-us/azure/virtual-network/manage-route-table#associate-a-route-table-to-a-subnet
+	Click “No” for “Propagate gateway routes”  
+	Create routes for Hub vNET IP Space or any Spoke vNETs to point to the next-hop of the FW Internal IP as shown in the diagram below  
+	Create a default-route 0.0.0.0/0 with a next-hop of the FW Internal IP.  
+        Associate the Routing table with the “OutsideSubnet” in your AVS Transit vNET.  
+
+ **Create a route table**  
+https://learn.microsoft.com/en-us/azure/virtual-network/manage-route-table#create-a-route-table  
+
+**Associate a route table to a subnet**  
+https://learn.microsoft.com/en-us/azure/virtual-network/manage-route-table#associate-a-route-table-to-a-subnet  
  
+24. Configure BGP from your BGP NVA Outside Interface IP to peer with the Azure Route Server in the Hub vNET.
 
-24.Configure BGP peering between the Outside Interface of the BGP NVA to the Azure Route Server in the Hub vNET. 
+25. Please make sure to use an eBGP multi-hop of 255 when peering from the BGP NVA to Azure Route Server. Please check with your vendor documentation on how to configure eBGP multi-hop. 
 
-25. Configure BGP routing on your BGP NVA Outside Interface IP to peer with the Azure Route Server
-
-26. Please make sure to use an eBGP multi-hop of 5 when peering from the BGP NVA to Azure Route Server
-
+**Complete the configuration on the NVA**  
 https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#complete-the-configuration-on-the-nva
 
-28. Configure BGP Peering from Hub vNET Azure Route Server to BGP NVA Outside IP
+26. Configure BGP Peering from Hub vNET Azure Route Server to BGP NVA Outside IP
 
+**Set up peering with NVA**
 https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#set-up-peering-with-nva
 
-29. Confirm BGP Neighbor is up between the BGP NVA and Azure Route Server in Hub vNET. You can check this on the NVA side.
+27. Confirm BGP Neighbor is up between the BGP NVA and Azure Route Server in Hub vNET. You can check this on the NVA side.
 
-
-30.  By default, the Azure Route Servers are hard coded to use BGP AS 65515 and up until the day of this writing there is currently no way to modify that. eBGP has a loop prevention mechanism where it will drops “BGP Routes” where it sees its own BGP AS in the "AS Path". For example, in the diagram below the BGP NVA learns routes from the Azure Route Server in the Hub vNET. The BGP NVA will then advertise those routes to the Azure Route Server in the AVS Transit vNET. The Azure Route Server on the AVS Transit vNET will drop the routes because it already sees itself in the BGP AS Path 65515.  To solve this problem, we need the BGP NVA to rewrite the AS 65515 so neither ARS on both sides sees itself in the AS Path and drops the routes. 
+28.  By default, the Azure Route Servers are hard coded to use BGP AS 65515 and up until the day of this writing there is currently no way to modify that. eBGP has a loop prevention mechanism where it will drops “BGP Routes” where it sees its own BGP AS in the "AS Path". For example, in the diagram below the BGP NVA learns routes from the Azure Route Server in the Hub vNET. The BGP NVA will then advertise those routes to the Azure Route Server in the AVS Transit vNET. The Azure Route Server on the AVS Transit vNET will drop the routes because it already sees itself in the BGP AS Path 65515.  To solve this problem, we need the BGP NVA to rewrite the AS 65515 so neither ARS on both sides sees itself in the AS Path and drops the routes. 
 
  ![image](https://user-images.githubusercontent.com/97964083/213533269-82efec30-1efb-495a-9821-2392e93d65b4.png)
 
