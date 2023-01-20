@@ -96,7 +96,7 @@ https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/scenarios/azure
 
 11. Peer your Hub vNET with the AVS Transit vNET
 
-**Create a peering**
+**Create a peering**  
 https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-manage-peering#create-a-peering
 
 12.	Create an ExpressRoute Virtual Network Gateway inside the AVS Transit vNET. Please see the link below on how to do the install.  
@@ -177,7 +177,7 @@ https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-
 
 26. Configure BGP Peering from Hub vNET Azure Route Server to BGP NVA Outside IP
 
-**Set up peering with NVA**
+**Set up peering with NVA**  
 https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#set-up-peering-with-nva
 
 27. Confirm BGP Neighbor is up between the BGP NVA and Azure Route Server in Hub vNET. You can check this on the NVA side.
