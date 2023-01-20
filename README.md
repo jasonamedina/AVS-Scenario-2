@@ -184,7 +184,8 @@ https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-
 
 28.  By default, the Azure Route Servers are hard coded to use BGP AS 65515 and up until the day of this writing there is currently no way to modify that. eBGP has a loop prevention mechanism where it will drops “BGP Routes” where it sees its own BGP AS in the "AS Path". For example, in the diagram below the BGP NVA learns routes from the Azure Route Server in the Hub vNET. The BGP NVA will then advertise those routes to the Azure Route Server in the AVS Transit vNET. The Azure Route Server on the AVS Transit vNET will drop the routes because it already sees itself in the BGP AS Path 65515.  To solve this problem, we need the BGP NVA to rewrite the AS 65515 so neither ARS on both sides sees itself in the AS Path and drops the routes. 
 
- ![image](https://user-images.githubusercontent.com/97964083/213533269-82efec30-1efb-495a-9821-2392e93d65b4.png)
+![image](https://user-images.githubusercontent.com/97964083/213778849-52b3a0e7-d692-45f8-84b9-150106ce03e9.png)
+
 
 ***Example if you're using Cisco CSR or Catalyst 8000v Edge***
 
