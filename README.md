@@ -71,15 +71,18 @@ https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/scenarios/azure
 	https://learn.microsoft.com/en-us/azure/virtual-network/manage-route-table#create-a-route-table  
 	
      **Associate a route table to a subnet**    
-     https://learn.microsoft.com/en-us/azure/virtual-network/manage-route-table#associate-a-route-table-to-a-subnet
-
-
-
-
-
-
-
-
+     https://learn.microsoft.com/en-us/azure/virtual-network/manage-route-table#associate-a-route-table-to-a-subnet  
+ &nbsp;  
+ &nbsp;  
+ &nbsp;  
+ &nbsp;  
+ &nbsp;  
+ &nbsp;  
+ &nbsp;  
+ &nbsp;  
+ &nbsp;  
+ &nbsp;  
+ &nbsp;  
 **AVS Transit vNET**
 
 10.	Create a new vNET that will be your “AVS Transit Virtual Network” in the same region where you will be deploying your AVS Private Cloud. Please make sure to size the vNET properly for a minimum of four subnets. 
