@@ -142,7 +142,7 @@ https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-
 
 19. Configure BGP routing from your BGP NVA Inside IP to peer with the Azure Route Server in the AVS Transit vNET.  
 
- **Complete the configuration on the NVA**
+ **Complete the configuration on the NVA**  
 https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-server-portal#complete-the-configuration-on-the-nva
 
 20. Configure eBGP multi-hop of 255 when peering from the BGP NVA to Azure Route Server. Please check with your vendor documentation on how to configure eBGP multi-hop. 
