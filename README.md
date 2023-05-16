@@ -186,10 +186,12 @@ https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-
 
 ![image](https://user-images.githubusercontent.com/97964083/213778849-52b3a0e7-d692-45f8-84b9-150106ce03e9.png)
 
-29. One feature to solve this problem is called BGP AS Override.  
+29. Please see the config example below that you can use for your Cisco 8K. 
 
-**Cisco 8K Config Example** 
-
+**Cisco 8K Config Example**  
+	
+	Copy and paste this section into your NVA    
+	#######################################################################
 	ip as-path access-list 1 permit _398656$
 	ip as-path access-list 1 permit _65515$
 	ip as-path access-list 2 deny _398656$
@@ -201,8 +203,7 @@ https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-
 	ip as-path access-list 4 deny _65515$
 	ip as-path access-list 4 deny ^$
 	ip as-path access-list 4 permit .*
-
-
+	!
 	route-map HUB-ARS-IN permit 10 
  	match as-path 2
 	!
@@ -216,8 +217,10 @@ https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-
 	!
 	route-map AVS-TRANSIT-ARS-IN permit 10 
  	match as-path 1
-
-
+	#######################################################################
+        
+	Modify the below config to match your environment before pasting the config into your NVA. 
+	#######################################################################
 	router bgp <Your ASN>
  	bgp log-neighbor-changes
  	maximum-paths 2
@@ -229,7 +232,7 @@ https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-
  	neighbor <IPAddress of Hub vNET ARS Instance#1> route-map HUB-ARS-IN in
  	neighbor <IPAddress of Hub vNET ARS Instance#1> route-map HUB-ARS-OUT out
  	neighbor <IPAddress of Hub vNET ARS Instance#1> filter-list 3 out
-
+        !   
  	neighbor <IPAddress of Hub vNET ARS Instance#2> remote-as 65515
  	neighbor <IPAddress of Hub vNET ARS Instance#2> description PEER-2 Hub vNET ARS
  	neighbor <IPAddress of Hub vNET ARS Instance#2> ebgp-multihop 255
@@ -237,7 +240,7 @@ https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-
  	neighbor <IPAddress of Hub vNET ARS Instance#2> route-map HUB-ARS-IN in
  	neighbor <IPAddress of Hub vNET ARS Instance#2> route-map HUB-ARS-OUT out
  	neighbor <IPAddress of Hub vNET ARS Instance#2> filter-list 3 out
-
+        !
  	neighbor <IPAddress of AVS Transit vNET ARS Instance#1> remote-as 65515
  	neighbor <IPAddress of AVS Transit vNET ARS Instance#1> description PEER-1 AVS vNET Transit ARS
  	neighbor <IPAddress of AVS Transit vNET ARS Instance#1> ebgp-multihop 255
@@ -245,7 +248,7 @@ https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-
  	neighbor <IPAddress of AVS Transit vNET ARS Instance#1> route-map AVS-TRANSIT-ARS-IN in
  	neighbor <IPAddress of AVS Transit vNET ARS Instance#1> route-map AVS-TRANSIT-ARS-OUT out
  	neighbor <IPAddress of AVS Transit vNET ARS Instance#1> filter-list 4 out
-
+        !
  	neighbor <IPAddress of AVS Transit vNET ARS Instance#2> remote-as 65515
  	neighbor <IPAddress of AVS Transit vNET ARS Instance#2> description PEER-2 AVS vNET Transit ARS
  	neighbor <IPAddress of AVS Transit vNET ARS Instance#2> ebgp-multihop 255
@@ -253,14 +256,18 @@ https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-
  	neighbor <IPAddress of AVS Transit vNET ARS Instance#2> route-map AVS-TRANSIT-ARS-IN in
  	neighbor <IPAddress of AVS Transit vNET ARS Instance#2> route-map AVS-TRANSIT-ARS-OUT out
  	neighbor <IPAddress of AVS Transit vNET ARS Instance#2> filter-list 4 out
- 
-
+        #######################################################################
+         
+	 Modify the below config to match your environment before pasting the config into your NVA. 
+        #######################################################################
 	ip route 0.0.0.0 0.0.0.0 <Default Gateway of Outside Subnet>
 	ip route <IPAddress of Hub vNET ARS Instance#1> 255.255.255.255 <Default Gateway of Outside Subnet>
 	ip route <IPAddress of Hub vNET ARS Instance#2> 255.255.255.255 <Default Gateway of Outside Subnet>
-
+        !
 	ip route <IPAddress of AVS Transit vNET ARS Instance#1> 255.255.255.255 <Default Gateway of Inside Subnet>
 	ip route <IPAddress of AVS Transit vNET ARS Instance#2> 255.255.255.255 <Default Gateway of Inside Subnet>
-
-
+        #######################################################################
+        
+	Make sure to save your config
+	wr mem
 
