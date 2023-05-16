@@ -188,51 +188,79 @@ https://learn.microsoft.com/en-us/azure/route-server/quickstart-configure-route-
 
 29. One feature to solve this problem is called BGP AS Override.  
 
-**Cisco CSR Config Example with AS Override**  
+**Cisco 8K Config Example** 
 
-	router bgp 65010
+	ip as-path access-list 1 permit _398656$
+	ip as-path access-list 1 permit _65515$
+	ip as-path access-list 2 deny _398656$
+	ip as-path access-list 2 permit .*
+	ip as-path access-list 3 permit _398656$
+	ip as-path access-list 3 permit _65515$
+	ip as-path access-list 3 permit ^$
+	ip as-path access-list 4 deny _398656$
+	ip as-path access-list 4 deny _65515$
+	ip as-path access-list 4 deny ^$
+	ip as-path access-list 4 permit .*
+
+
+	route-map HUB-ARS-IN permit 10 
+ 	match as-path 2
+	!
+	route-map AVS-TRANSIT-ARS-OUT permit 10 
+ 	set as-path replace any
+	!
+	route-map HUB-ARS-OUT permit 10 
+ 	set as-path replace 65515 12076 398656
+ 	set as-path replace 65515
+ 	set as-path replace 12076
+	!
+	route-map AVS-TRANSIT-ARS-IN permit 10 
+ 	match as-path 1
+
+
+	router bgp <Your ASN>
  	bgp log-neighbor-changes
-	
-	Neighbor Configuration to ARS in Hub vNET
-	##################################################
- 	neighbor 10.100.1.4 remote-as 65515
- 	neighbor 10.100.1.4 description PEER-1 NET Hub vNET ARS
- 	neighbor 10.100.1.4 ebgp-multihop 255
- 	neighbor 10.100.1.4 as-override
- 	neighbor 10.100.1.4 soft-reconfiguration inbound
- 	neighbor 10.100.1.5 remote-as 65515
- 	neighbor 10.100.1.5 description PEER-2 Hub vNET ARS
- 	neighbor 10.100.1.5 ebgp-multihop 255
- 	neighbor 10.100.1.5 as-override
- 	neighbor 10.100.1.5 soft-reconfiguration inbound
-	##################################################  
-        
-	Neighbor Configuration to ARS in AVS Transit vNET
-	##################################################
- 	neighbor 10.200.1.4 description PEER-1 AVS vNET Transit ARS
- 	neighbor 10.200.1.4 remote-as 65515
- 	neighbor 10.200.1.4 ebgp-multihop 255
- 	neighbor 10.200.1.4 as-override
- 	neighbor 10.200.1.4 soft-reconfiguration inbound
- 	neighbor 10.200.1.5 description PEER-2 AVS vNET Transit ARS
- 	neighbor 10.200.1.5 remote-as 65515
- 	neighbor 10.200.1.5 ebgp-multihop 255
- 	neighbor 10.200.1.5 as-override
- 	neighbor 10.200.1.5 soft-reconfiguration inbound
-	##################################################
-	
-	Static Route to ARS in Hub vNET from Outside Interface. Use Default-Gateway of the Outside Subnet for the next hop.
-	###################################################################################################################
-	ip route 10.100.1.4 255.255.255.255 10.20.20.1
-	ip route 10.100.1.5 255.255.255.255 10.20.20.1                                                                                                    
-	###################################################################################################################  
-	
-	Static Route to ARS in AVS vNET Transit from Inside Interface. Use Default-Gateway of the Inside Subnet for the next hop.  
-	#########################################################################################################################  
-	ip route 10.200.1.4 255.255.255.255 10.30.30.1  
-	ip route 10.200.1.5 255.255.255.255 10.30.30.1  
-	#########################################################################################################################
-	
-Please make sure to follow up with your vendor's documentation on how to configure BGP AS-Override or rewriting the BGP AS. 
+ 	maximum-paths 2
+ 	aggregate-address <AVS /22 Management Address> 255.255.252.0 summary-only
+ 	neighbor <IPAddress of Hub vNET ARS Instance#1> remote-as 65515
+ 	neighbor <IPAddress of Hub vNET ARS Instance#1> description PEER-1 NET Hub vNET ARS
+ 	neighbor <IPAddress of Hub vNET ARS Instance#1> ebgp-multihop 255
+ 	neighbor <IPAddress of Hub vNET ARS Instance#1> soft-reconfiguration inbound
+ 	neighbor <IPAddress of Hub vNET ARS Instance#1> route-map HUB-ARS-IN in
+ 	neighbor <IPAddress of Hub vNET ARS Instance#1> route-map HUB-ARS-OUT out
+ 	neighbor <IPAddress of Hub vNET ARS Instance#1> filter-list 3 out
+
+ 	neighbor <IPAddress of Hub vNET ARS Instance#2> remote-as 65515
+ 	neighbor <IPAddress of Hub vNET ARS Instance#2> description PEER-2 Hub vNET ARS
+ 	neighbor <IPAddress of Hub vNET ARS Instance#2> ebgp-multihop 255
+ 	neighbor <IPAddress of Hub vNET ARS Instance#2> soft-reconfiguration inbound
+ 	neighbor <IPAddress of Hub vNET ARS Instance#2> route-map HUB-ARS-IN in
+ 	neighbor <IPAddress of Hub vNET ARS Instance#2> route-map HUB-ARS-OUT out
+ 	neighbor <IPAddress of Hub vNET ARS Instance#2> filter-list 3 out
+
+ 	neighbor <IPAddress of AVS Transit vNET ARS Instance#1> remote-as 65515
+ 	neighbor <IPAddress of AVS Transit vNET ARS Instance#1> description PEER-1 AVS vNET Transit ARS
+ 	neighbor <IPAddress of AVS Transit vNET ARS Instance#1> ebgp-multihop 255
+ 	neighbor <IPAddress of AVS Transit vNET ARS Instance#1> soft-reconfiguration inbound
+ 	neighbor <IPAddress of AVS Transit vNET ARS Instance#1> route-map AVS-TRANSIT-ARS-IN in
+ 	neighbor <IPAddress of AVS Transit vNET ARS Instance#1> route-map AVS-TRANSIT-ARS-OUT out
+ 	neighbor <IPAddress of AVS Transit vNET ARS Instance#1> filter-list 4 out
+
+ 	neighbor <IPAddress of AVS Transit vNET ARS Instance#2> remote-as 65515
+ 	neighbor <IPAddress of AVS Transit vNET ARS Instance#2> description PEER-2 AVS vNET Transit ARS
+ 	neighbor <IPAddress of AVS Transit vNET ARS Instance#2> ebgp-multihop 255
+ 	neighbor <IPAddress of AVS Transit vNET ARS Instance#2> soft-reconfiguration inbound
+ 	neighbor <IPAddress of AVS Transit vNET ARS Instance#2> route-map AVS-TRANSIT-ARS-IN in
+ 	neighbor <IPAddress of AVS Transit vNET ARS Instance#2> route-map AVS-TRANSIT-ARS-OUT out
+ 	neighbor <IPAddress of AVS Transit vNET ARS Instance#2> filter-list 4 out
+ 
+
+	ip route 0.0.0.0 0.0.0.0 <Default Gateway of Outside Subnet>
+	ip route <IPAddress of Hub vNET ARS Instance#1> 255.255.255.255 <Default Gateway of Outside Subnet>
+	ip route <IPAddress of Hub vNET ARS Instance#2> 255.255.255.255 <Default Gateway of Outside Subnet>
+
+	ip route <IPAddress of AVS Transit vNET ARS Instance#1> 255.255.255.255 <Default Gateway of Inside Subnet>
+	ip route <IPAddress of AVS Transit vNET ARS Instance#2> 255.255.255.255 <Default Gateway of Inside Subnet>
+
 
 
